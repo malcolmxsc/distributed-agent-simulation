@@ -1,19 +1,83 @@
-version: '3.8'
-
 services:
-  ai-gateway:
-    build: ./ai-gateway
+  # 1. LOCAL AI BRAIN (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # 2. THE TARGET (System Under Test)
+  target-llm:
+    build:
+      context: ./ai-gateway
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    environment:
+      - SERVICE_ROLE=target
+      - JUDGE_URL=http://judge-llm:8000/evaluate
+      - OPENAI_API_KEY=ollama
+      - OPENAI_BASE_URL=http://ollama:11434/v1
+      - LLM_MODEL=gemma:2b
+    depends_on:
+      - ollama
     volumes:
       - ./ai-gateway:/app
-    environment:
-      - PYTHONUNBUFFERED=1
 
-  chaos-engine:
-    build: ./chaos-engine
-    # No ports needed for chaos engine as it's a load generator, 
-    # but we might want to expose metrics if it had them.
-    # For now, just keeping it simple.
+  # 3. THE JUDGE (Evaluator)
+  judge-llm:
+    build:
+      context: ./ai-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    environment:
+      - SERVICE_ROLE=judge
+      - OPENAI_API_KEY=ollama
+      - OPENAI_BASE_URL=http://ollama:11434/v1
+      - LLM_MODEL=gemma:2b
     depends_on:
-      - ai-gateway
+      - ollama
+    volumes:
+      - ./ai-gateway:/app
+
+  # 4. THE ATTACKER (Chaos Engine)
+  chaos-engine:
+    build:
+      context: ./chaos-engine
+      dockerfile: Dockerfile
+    depends_on:
+      - target-llm
+    environment:
+      - TARGET_URL=http://target-llm:8000/chat
+    restart: on-failure
+
+  # 5. METRICS (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9999:9090"
+    depends_on:
+      - target-llm
+
+  # 6. DASHBOARD (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      # Mount the provisioning config
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      # Mount the actual dashboard JSON
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+
+volumes:
+  ollama_data:

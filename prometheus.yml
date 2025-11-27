@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "sim-eval-platform"
+    static_configs:
+      # we use docker service name " ai-gateway" and port "8000 " to access the metrics endpoint
+      - targets: ["target-llm:8000"]

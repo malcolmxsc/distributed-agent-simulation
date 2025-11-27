@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
-
+	"os"
 )
 
 // -- CONFIGURATION --
@@ -19,10 +19,11 @@ const (
 	// if running locally with 'go run', use localhost
 	// if running in docker, this will be overridden by the ENV variables.
 
-	TargetURL     = "http://localhost:8000/chat"
-	TotalWorkers  = 10  // number of concurrent "users"
-	TotalRequests = 100 // total messages to send
+	TotalWorkers  = 5  // number of concurrent "users"
+	TotalRequests = 200 // total messages to send
 )
+
+var TargetURL = "http://localhost:8000/chat"
 
 // -- DATA MODEL --
 // this matches the python "ChatRequest" model
@@ -35,6 +36,9 @@ type Payload struct {
 func main() {
 	fmt.Println("Starting Simulation Chaos Engine...")
 	fmt.Println("Starting Simulation Chaos Engine...")
+	if envURL := os.Getenv("TARGET_URL"); envURL != "" {
+		TargetURL = envURL
+	}
 	fmt.Printf("Targeting: %s\n", TargetURL)
 	fmt.Printf("Spawning %d concurrent workers...\n", TotalWorkers)
 

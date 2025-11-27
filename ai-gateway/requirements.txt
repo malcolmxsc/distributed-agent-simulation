@@ -1,3 +1,7 @@
-fastapi
-uvicorn
-prometheus-client
+fastapi==0.111.0
+uvicorn==0.30.1
+prometheus_client==0.20.0
+pydantic==2.7.4
+requests==2.32.3
+openai==1.55.0
+httpx==0.27.2
