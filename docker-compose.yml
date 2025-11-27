@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  ai-gateway:
+    build: ./ai-gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-gateway:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  chaos-engine:
+    build: ./chaos-engine
+    # No ports needed for chaos engine as it's a load generator, 
+    # but we might want to expose metrics if it had them.
+    # For now, just keeping it simple.
+    depends_on:
+      - ai-gateway
