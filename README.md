@@ -13,11 +13,15 @@
 
 ---
 
+
+
+
+
 ## 🎥 System Demo
 
 | **Mission Control** | **Forensic Tracing** | **Adversarial Engine** |
 | :---: | :---: | :---: |
-| <video src="https://github.com/user-attachments/assets/f8ce0623-3360-4021-a2e5-33b659e0ec1c" width="100%" controls></video> | <video src="https://github.com/user-attachments/assets/174580cb-b3f1-4964-b35f-03d1616ad84e" width="100%" controls></video> | <video src="https://github.com/user-attachments/assets/ffcb97ea-1643-40f1-9d45-394bff3a193b" width="100%" controls></video> |
+| <video src="https://github.com/user-attachments/assets/3b879237-7765-4943-a635-a4907af1e473" width="100%" controls></video> | <video src="https://github.com/user-attachments/assets/174580cb-b3f1-4964-b35f-03d1616ad84e" width="100%" controls></video> | <video src="https://github.com/user-attachments/assets/ffcb97ea-1643-40f1-9d45-394bff3a193b" width="100%" controls></video> |
 | **Real-time Observability**<br>Visualizes high-concurrency traffic (Green) vs. safety violation spikes (Red). Monitors inference latency to ensure non-blocking performance. | **End-to-End Tracing**<br>Correlates specific adversarial prompts with their safety verdicts across microservices using unique `X-Trace-ID` injection in Grafana Loki. | **Chaos Engine**<br>High-performance Go-based load generator using Goroutines to inject randomized jailbreak vectors (DAN, Social Engineering) at scale. |
 
 ---
